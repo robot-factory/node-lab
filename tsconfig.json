@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "sourceMap": true,
+    "lib": ["esnext"],
+    "moduleResolution": "node",
+    "rootDir": ".",
+    "outDir": "./build/",
+     /* Experimental Options */
+     "experimentalDecorators": true,
+     /* Enables experimental support for ES7 decorators. */
+     "emitDecoratorMetadata": true
+  },
+  "include": ["."]
+}
