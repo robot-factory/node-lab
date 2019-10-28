@@ -6,6 +6,8 @@
     "moduleResolution": "node",
     "rootDir": ".",
     "outDir": "./build/",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
      /* Experimental Options */
      "experimentalDecorators": true,
      /* Enables experimental support for ES7 decorators. */
