@@ -34,12 +34,24 @@ class BaseServer {
 
 const server = new BaseServer("base Server");
 
+class Store {
+
+}
+
 const connectionHandler = (socket: net.Socket) => {
+  log(`${JSON.stringify(socket.address())} connect`)
+
   socket.on("data", (data: Buffer) => {
     log(data.toString());
   });
 
-  socket.on("close", () => {});
+  socket.on("close", () => {
+    log(`${socket.remoteFamily}/${socket.remoteAddress}/${socket.remotePort} close`)
+  });
+
+  socket.on('error', (err: Error) => {
+    log(err.message)
+  })
 };
 
 server.setHandler(connectionHandler);
