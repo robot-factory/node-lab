@@ -22,7 +22,7 @@ class BaseServer {
   };
 
   listen = (port: number, cb?: () => void) => {
-    this._server.listen(port, '0.0.0.0', () => {
+    this._server.listen(port, "0.0.0.0", () => {
       if (cb) {
         cb();
       } else {
@@ -35,24 +35,69 @@ class BaseServer {
 const server = new BaseServer("base Server");
 
 class Store {
+  conns: Map<number, net.Socket>;
+  nextId: number = 0;
 
+  getConns = (id: number) => {
+    return this.conns.get(id);
+  };
+
+  appendConn = (socket: net.Socket) => {
+    this.conns.set(this.nextId, socket);
+    this.nextId += 1;
+    return this.nextId - 1;
+  };
+
+  removeConn = (id: number) => {
+    this.conns.delete(id);
+  };
 }
 
+const store = new Store();
+// class BaseHandler {
+//   private _store: any;
+//   private _socket: net.Socket
+
+//   constructor(socket: net.Socket, stateStore: any) {
+//     this._store = stateStore;
+//     this._socket = socket
+//   }
+
+//   initConnection = () => {
+//     const conId = `${this._socket.remoteFamily}/${this._socket.remoteAddress}/${this._socket.remotePort}`;
+//     log(`${conId} connect`);
+//   };
+
+//   onMessage = () => (data: Buffer) => {
+//     log(data.toString());
+//   };
+
+//   onClose = () => {
+//     log("close");
+//   };
+
+//   onError = (err: Error) => {
+//     log(err.message);
+//   };
+
+// }
+
 const connectionHandler = (socket: net.Socket) => {
-  const conId = `${socket.remoteFamily}/${socket.remoteAddress}/${socket.remotePort}`
-  log(`${conId} connect`)
+  const connInfo = `${socket.remoteAddress}:${socket.remotePort}`;
+  const connId = store.appendConn(socket);
+  log(`ID:${connId}(${connInfo}) connect`);
 
   socket.on("data", (data: Buffer) => {
     log(data.toString());
   });
 
   socket.on("close", () => {
-    log(`${conId} close`)
+    log(`ID:${connId} close`);
   });
 
-  socket.on('error', (err: Error) => {
-    log(err.message)
-  })
+  socket.on("error", (err: Error) => {
+    log(err.message);
+  });
 };
 
 server.setHandler(connectionHandler);
