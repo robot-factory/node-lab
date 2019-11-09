@@ -72,7 +72,16 @@ const client = net.connect(
       id++;
     }, 20000);
     client.write(
-      JSON.stringify({ id, method: "requestConnect", payload: [7] })
+      JSON.stringify({ id, method: "requestConnect", payload: [10] })
+    );
+    const socket = net.connect(
+      { host: "14.154.28.175", port: 9000, localPort },
+      () => {
+        socket.write("hello world")
+        socket.on("data", (data)=>{
+          console.log(data)
+        })
+      }
     );
 
     client.on("data", function(data) {
@@ -111,6 +120,6 @@ const client = net.connect(
   }
 );
 
-server.listen(localPort, () => {
-  log("The server now is listening 9001");
-});
+// server.listen(localPort, () => {
+//   log("The server now is listening 9001");
+// });
