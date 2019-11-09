@@ -20,8 +20,8 @@
 // );
 
 import net from "net";
-// host: '47.106.122.155',
-const client = net.connect({ port: 10001 }, function() {
+
+const client = net.connect({host: '47.106.122.155', port: 10001 }, function() {
   const name = "客户机2";
   client.write(name + " 上线了！\n");
   // client.end(name + " 下线了！\n");
@@ -39,7 +39,6 @@ const client = net.connect({ port: 10001 }, function() {
     console.log(err);
   });
 });
-
 
 // const client2 = net.connect({host:'192.168.1.1',port: 10403},function(){
 //   const name = '客户机2';

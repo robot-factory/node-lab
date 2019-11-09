@@ -22,7 +22,7 @@ class BaseServer {
   };
 
   listen = (port: number, cb?: () => void) => {
-    this._server.listen(port, () => {
+    this._server.listen(port, '0.0.0.0', () => {
       if (cb) {
         cb();
       } else {
