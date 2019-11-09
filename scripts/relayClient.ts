@@ -5,53 +5,6 @@ interface RpcCall {
   method: string;
   payload: any[];
 }
-
-const client = net.connect(
-  { host: "47.106.122.155", port: 10001, localPort: 9001 },
-  function() {
-    let id = 1;
-    const name = "客户机2";
-    client.write(JSON.stringify({ id, method: "getPeers", payload: [] }));
-    id++;
-    // client.end(name + " 下线了！\n");
-    const sendTimer = setInterval(() => {
-      client.write(JSON.stringify({ id, method: "getPeers", payload: [] }));
-      id++;
-    }, 20000);
-    client.write(JSON.stringify({ id, method: "requestConnect", payload: [] }));
-
-    client.on("data", function(data) {
-      console.log(data.toString());
-      try {
-        const rpc = JSON.parse(data.toString()) as RpcCall;
-        switch (rpc.method) {
-          case "postRequestConnect":
-            const targetHost = rpc.payload[0].split(":")[0];
-            const targetPort = Number(rpc.payload[0].split(":")[1]);
-            const socket = net.connect(
-              { host: targetHost, port: targetPort, localPort: 9001 },
-              function() {
-                socket.write('hello world')
-              }
-            );
-            break
-          default:
-            console.log(rpc.method)
-        }
-      } catch (e) {
-        log(e.message);
-      }
-    });
-    client.on("close", () => {
-      console.log("连接关闭");
-      clearInterval(sendTimer);
-    });
-    client.on("error", (err: Error) => {
-      console.log(err);
-    });
-  }
-);
-
 const log = console.log;
 
 class BaseServer {
@@ -105,6 +58,59 @@ const connectionHandler = (socket: net.Socket) => {
 
 server.setHandler(connectionHandler);
 
-server.listen(9001, () => {
+const localPort = 9001;
+const client = net.connect(
+  { host: "47.106.122.155", port: 10001, localPort },
+  function() {
+    let id = 1;
+    const name = "客户机2";
+    client.write(JSON.stringify({ id, method: "getPeers", payload: [] }));
+    id++;
+    // client.end(name + " 下线了！\n");
+    const sendTimer = setInterval(() => {
+      client.write(JSON.stringify({ id, method: "getPeers", payload: [] }));
+      id++;
+    }, 20000);
+    client.write(
+      JSON.stringify({ id, method: "requestConnect", payload: [7] })
+    );
+
+    client.on("data", function(data) {
+      console.log(data.toString());
+      try {
+        const rpc = JSON.parse(data.toString()) as RpcCall;
+        switch (rpc.method) {
+          case "postRequestConnect":
+            const targetHost = rpc.payload[0].split(":")[0];
+            const targetPort = Number(rpc.payload[0].split(":")[1]);
+            const socket = net.connect(
+              { host: targetHost, port: targetPort, localPort },
+              function() {
+                socket.write("hello world");
+                socket.end();
+                server.listen(localPort, () => {
+                  log("The server now is listening 9001");
+                });
+              }
+            );
+            break;
+          default:
+            console.log(rpc.method);
+        }
+      } catch (e) {
+        log(e.message);
+      }
+    });
+    client.on("close", () => {
+      console.log("连接关闭");
+      clearInterval(sendTimer);
+    });
+    client.on("error", (err: Error) => {
+      console.log(err);
+    });
+  }
+);
+
+server.listen(localPort, () => {
   log("The server now is listening 9001");
 });
