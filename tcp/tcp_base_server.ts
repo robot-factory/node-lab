@@ -39,14 +39,15 @@ class Store {
 }
 
 const connectionHandler = (socket: net.Socket) => {
-  log(`${JSON.stringify(socket.address())} connect`)
+  const conId = `${socket.remoteFamily}/${socket.remoteAddress}/${socket.remotePort}`
+  log(`${conId} connect`)
 
   socket.on("data", (data: Buffer) => {
     log(data.toString());
   });
 
   socket.on("close", () => {
-    log(`${socket.remoteFamily}/${socket.remoteAddress}/${socket.remotePort} close`)
+    log(`${conId} close`)
   });
 
   socket.on('error', (err: Error) => {
