@@ -2,7 +2,7 @@ import net from "net";
 
 const log = console.log;
 
-class BaseServer {
+export class BaseServer {
   private _server: net.Server;
   name: string;
 
@@ -21,14 +21,24 @@ class BaseServer {
     this._server.on("connection", conHandler);
   };
 
-  listen = (port: number, cb?: () => void) => {
-    this._server.listen(port, "0.0.0.0", () => {
-      if (cb) {
-        cb();
-      } else {
-        log(`The ${this.name} is listening...`);
-      }
-    });
+  listen = (port: number | net.ListenOptions, cb?: () => void) => {
+    if ( typeof port === 'number') {
+      this._server.listen(port, "0.0.0.0", () => {
+        if (cb) {
+          cb();
+        } else {
+          log(`The ${this.name} is listening...`);
+        }
+      });
+    } else {
+      this._server.listen(port, () => {
+        if (cb) {
+          cb();
+        } else {
+          log(`The ${this.name} is listening...`);
+        }
+      });
+    }
   };
 }
 

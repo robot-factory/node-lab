@@ -37,6 +37,10 @@ class BaseServer {
   };
 }
 
+const startServer = (port: number) => {
+
+} 
+
 const server = new BaseServer("base Server");
 
 const connectionHandler = (socket: net.Socket) => {
