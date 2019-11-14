@@ -48,6 +48,10 @@ class Store {
   conns: Map<number, net.Socket>;
   nextId: number = 0;
 
+  constructor() {
+    this.conns = new Map()
+  }
+
   getConns = (id: number) => {
     return this.conns.get(id);
   };
