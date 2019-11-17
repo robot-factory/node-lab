@@ -96,6 +96,23 @@ const store = new Store();
 
 // }
 
+export const defaultHandler = (socket: net.Socket) => {
+  const connInfo = `${socket.remoteAddress}:${socket.remotePort}`;
+  log(`${connInfo} connect`);
+
+  socket.on("data", (data: Buffer) => {
+    log(data.toString());
+  });
+
+  socket.on("close", () => {
+    log(`${connInfo} close`);
+  });
+
+  socket.on("error", (err: Error) => {
+    log(err.message);
+  });
+};
+
 const connectionHandler = (socket: net.Socket) => {
   const connInfo = `${socket.remoteAddress}:${socket.remotePort}`;
   const connId = store.appendConn(socket);

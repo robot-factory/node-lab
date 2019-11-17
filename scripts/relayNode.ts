@@ -1,5 +1,7 @@
 import dgram from "dgram";
 
+const log = console.log;
+
 enum METHOD {
   register, // return id
   postRegister,
@@ -53,7 +55,7 @@ class Store {
 /**
  * TODO: add readbuf && writebuf
  */
-class RelayNode {
+export class RelayNode {
   socket: dgram.Socket;
   cbs: Map<number, (result: string) => void> = new Map();
   sendId: number;
@@ -65,10 +67,14 @@ class RelayNode {
     this.socket.on("close", this.handleClose);
 
     this.socket.on("error", function(err: Error) {
-      console.log("some error on udp client.");
+      console.log("some error on udp client:", err.message);
     });
 
-    this.socket.bind(port, "0.0.0.0");
+    this.socket.on("message", this.handleMsg);
+
+    this.socket.bind(port, "0.0.0.0", () => {
+      log(`the node is listening ${port}`);
+    });
 
     this.sendId = 1;
 
@@ -107,7 +113,10 @@ class RelayNode {
   };
 
   handleResponse = (response: RpcResponse) => {
-    return;
+    const cb = this.cbs.get(response.id);
+    if (cb) {
+      cb(response.result);
+    }
   };
 
   handleRequest = (
@@ -119,16 +128,19 @@ class RelayNode {
         const result = JSON.stringify([...this.store.getPeers()]);
         return this.generateResponse(request.id, result);
       }
+
       case METHOD.ping: {
         const result = EMPTY_PAYLOAD;
         return this.generateResponse(request.id, result);
       }
+
       case METHOD.register: {
         const result = JSON.stringify([
           this.store.addPeer(`${rinfo.address}:${rinfo.port}`)
         ]);
         return this.generateResponse(request.id, result);
       }
+
       case METHOD.postRegister: {
         const addressPort = JSON.parse(request.payload);
         this.store.addPeer(`${addressPort[0]}:${addressPort[1]}`);
@@ -136,8 +148,9 @@ class RelayNode {
         const result = EMPTY_PAYLOAD;
         return this.generateResponse(request.id, result);
       }
+
       case METHOD.postToPeer: {
-        const targetId = Number(JSON.parse(request.payload)[0]);
+        const targetId = JSON.parse(request.payload)[0] as number;
         const addressPort = this.store.getPeer(targetId);
         if (addressPort) {
           const [address, port] = addressPort.split(":");
@@ -151,6 +164,7 @@ class RelayNode {
         const result = addressPort || EMPTY_PAYLOAD;
         return this.generateResponse(request.id, result);
       }
+
       default: {
         return this.generateResponse(request.id, "unknown method");
       }
@@ -176,6 +190,15 @@ class RelayNode {
     this.sendRequest(METHOD.getPeers, EMPTY_PAYLOAD, port, address);
   };
 
+  sendMethodPostToPeer = (targetId: number, port: number, address: string) => {
+    const payload = JSON.stringify([targetId]);
+    this.sendRequest(METHOD.postToPeer, payload, port, address);
+  };
+
+  sendMethodPing = (port: number, address: string) => {
+    this.sendRequest(METHOD.ping, EMPTY_PAYLOAD, port, address);
+  };
+
   generateResponse(id: number, result: string) {
     return {
       id,
@@ -197,6 +220,7 @@ class RelayNode {
       id: this.sendId,
       version: this.version
     };
+    // log(JSON.stringify(request));
     this.send(JSON.stringify(request), port, address);
     this.sendId = this.sendId + 1;
     if (cb) {
@@ -205,6 +229,7 @@ class RelayNode {
   };
 
   send = (msg: string, port: number, address: string) => {
-    this.socket.send(msg, port, address);
+    this.socket.send(msg, 0, msg.length, port, address);
+    // log(msg)
   };
 }
