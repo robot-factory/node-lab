@@ -41,7 +41,7 @@ function _generatiTrees(l: number, r: number) {
   }
   return result;
 }
-
+// 原来这种方法叫递归+memorize
 function generateTrees2(n: number) {
   if (n === 0) {
     return []
