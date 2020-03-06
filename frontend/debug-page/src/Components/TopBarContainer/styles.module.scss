@@ -1,0 +1,27 @@
+.topbar {
+  width: 100%;
+  box-sizing: border-box;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+
+  background: #000033;
+  .content {
+    color: #fff;
+    width: 1400px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .right {
+      display: flex;
+      justify-content: right;
+    }
+
+    a {
+      color: white;
+      text-decoration: none;
+    }
+  }
+}
