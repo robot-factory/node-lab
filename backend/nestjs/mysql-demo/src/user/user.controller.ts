@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Req, Body } from '@nestjs/common';
+import { Controller, Get, Post, Req, Body, Header, HttpCode, HttpStatus } from '@nestjs/common';
 import {CreateUserDto} from './dto'
-import { Request, json } from 'express';
 import {UserService} from './user.service'
+import {UserResponse} from './user.interface'
 
 
 @Controller('user')
@@ -14,8 +14,10 @@ export class UserController {
   }
 
   @Post('/register')
-  register(@Body() body: CreateUserDto):string {
-    const result = this.userService.AddUser(body)
-    return JSON.stringify(result)
+  @HttpCode(HttpStatus.CREATED)
+  async register(@Body() body: CreateUserDto):Promise<UserResponse> {
+    const result = await this.userService.AddUser(body)
+    console.log(result)
+    return result
   }
 }
