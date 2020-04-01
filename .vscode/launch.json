@@ -7,9 +7,13 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "program": "${workspaceFolder}/${relativeFile}",// or $【file}
-      "preLaunchTask": "tsc",
+      "name": "Current TS File",
+      "program": "${workspaceFolder}/node_modules/.bin/ts-node",// or $【file}
+      "args": [
+        "${relativeFile}"
+      ],
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector",
       "sourceMaps": true,
       "outFiles": [
         "${workspaceFolder}/build/**/*.js"
