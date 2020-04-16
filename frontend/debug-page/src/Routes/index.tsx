@@ -13,6 +13,7 @@ import styles from './index.module.scss'
 const Debug = lazy(() => import('Pages/Debug'))
 const Home = lazy(()=> import('Pages/Home'))
 const UnmountDemo = lazy(()=>import('Pages/UnmoutDemo'))
+const RenderTime = lazy(()=> import('Pages/RenderTime'))
 
 
 interface Props {
@@ -30,6 +31,7 @@ class Routes extends React.Component<Props> {
           <Link to={'/home'}>home</Link>
           <Link to={'/debug'}>debug</Link>
           <Link to={'/unmountDemo'}>unmountDemo</Link>
+          <Link to={'/renderTime'}>RenderTime</Link>
         </div>
         <div className={styles.rightMain}>
         <Switch>
@@ -37,6 +39,7 @@ class Routes extends React.Component<Props> {
           <Route path="/home" component={Home} />
           <Route path="/debug" component={Debug} />
           <Route path="/unmountDemo" component={UnmountDemo} />
+          <Route path="/renderTime" component={RenderTime} />
         </Switch>
         </div>
         {/* <Hint {...hint} />
