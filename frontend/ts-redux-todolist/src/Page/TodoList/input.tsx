@@ -1,22 +1,33 @@
-import React from 'react'
+import React from 'react';
+import { connect } from 'react-redux';
+import { addTodo } from 'Redux/action';
+import { Dispatch } from 'redux';
 
-class TodoInput extends React.Component {
-    state={
-        todo: '',
-    }
+let TodoInput: React.FC<{ dispatch: Dispatch }> = ({ dispatch }) => {
+  const [todoText, setTodoText] = React.useState('');
 
-    handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-        this.setState({todo: e.target.value});
-    }
+  return (
+    <div>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!todoText.trim()) {
+            return;
+          }
+          dispatch(addTodo(todoText));
+          setTodoText('');
+        }}
+      >
+        <input
+          value={todoText}
+          onChange={(e) => {
+            setTodoText(e.target.value);
+          }}
+        />
+        <button type="submit">Add Todo</button>
+      </form>
+    </div>
+  );
+};
 
-    render() {
-        console.log('render TodoInput');
-        return (
-            <div>
-                <input value={this.state.todo} onChange={this.handleInput} />
-            </div>
-        )
-    }
-}
-
-export default TodoInput
+export default connect()(TodoInput);

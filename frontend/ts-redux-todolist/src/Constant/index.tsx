@@ -1,0 +1,5 @@
+export enum FILTER_METHOD {
+  SHOW_ALL,
+  SHOW_COMPLETED,
+  SHOW_ACTIVE,
+}
